@@ -1,4 +1,4 @@
-package entities
+package main
 
 type OrderWB struct {
 	OrderUID              string   `json:"orderUid"`

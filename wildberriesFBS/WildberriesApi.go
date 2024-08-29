@@ -1,4 +1,4 @@
-package WildberriesApi
+package main
 
 import (
 	"io"
