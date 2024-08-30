@@ -6,6 +6,7 @@ import (
 	"firstProject/wildberriesFBS"
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"strings"
@@ -44,8 +45,12 @@ var (
 )
 
 func main() {
-	var err error
-	bot, err = tgbotapi.NewBotAPI("7301038810:AAEFiGreIBmYQloY69ncC7wqMFveZzVMt40")
+	token, err := initEnv("variables.env", "TOKEN")
+	if err != nil {
+		return
+	}
+
+	bot, err = tgbotapi.NewBotAPI(token)
 	if err != nil {
 		// Abort if something is wrong
 		log.Panic(err)
@@ -118,7 +123,13 @@ func handleMessage(message *tgbotapi.Message) {
 		err = handleCommand(message, text)
 	} else if strings.HasPrefix(text, "WB") {
 		sendTextMessage(message, "Готовлю файл")
-		err := wildberriesFBS.GetReadyFile(text)
+
+		wildberriesKey, err := initEnv("variables.env", "API_KEY_WB")
+		if err != nil {
+			return
+		}
+
+		err = wildberriesFBS.GetReadyFile(wildberriesKey, text)
 		if err != nil {
 			sendTextMessage(message, err.Error())
 		} else {
@@ -202,4 +213,19 @@ func sendMediaMessage(message *tgbotapi.Message, text string) {
 		log.Panic(err)
 	}
 	fmt.Println("Документ успешно отправлен!")
+}
+
+func initEnv(path, name string) (string, error) {
+	err := godotenv.Load(path)
+	if err != nil {
+		log.Printf("Ошибка загрузки файла %s: %v\n", path, err)
+		return "", fmt.Errorf("ошибка загрузки файла " + path)
+	}
+	// Получаем значения переменных среды
+	env := os.Getenv(name)
+
+	if env == "" {
+		return "", fmt.Errorf("переменная среды " + name + " не установлена")
+	}
+	return env, err
 }

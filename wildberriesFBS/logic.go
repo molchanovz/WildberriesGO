@@ -3,7 +3,6 @@ package wildberriesFBS
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/joho/godotenv"
 	"github.com/jung-kurt/gofpdf"
 	"log"
 	"os"
@@ -11,18 +10,7 @@ import (
 	"strconv"
 )
 
-func GetReadyFile(supplyId string) error {
-	err := godotenv.Load("variables.env")
-	if err != nil {
-		log.Fatalf("Ошибка загрузки файла %s: %v", "variables.env", err)
-	}
-	// Получаем значения переменных среды
-	wildberriesKey := os.Getenv("API_KEY_WB")
-
-	if wildberriesKey == "" {
-		return fmt.Errorf("Переменная среды API_KEY не установлена")
-	}
-
+func GetReadyFile(wildberriesKey, supplyId string) error {
 	orders := GetOrders_FBS(wildberriesKey, supplyId)
 	var ordersSlice []string
 	for _, order := range orders {
@@ -30,7 +18,7 @@ func GetReadyFile(supplyId string) error {
 		decodeToPDF(stickers.Stickers[0].File, stickers.Stickers[0].OrderId, order.SKUs[0])
 		ordersSlice = append(ordersSlice, "wildberriesFBS/ready/"+strconv.Itoa(order.ID)+".pdf")
 	}
-	err = mergePDFsInDirectory(ordersSlice, "wildberriesFBS/"+supplyId+".pdf")
+	err := mergePDFsInDirectory(ordersSlice, "wildberriesFBS/"+supplyId+".pdf")
 	if err != nil {
 		return err
 	}
