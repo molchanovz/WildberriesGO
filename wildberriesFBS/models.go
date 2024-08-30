@@ -1,4 +1,4 @@
-package main
+package wildberriesFBS
 
 type OrderWB struct {
 	OrderUID              string   `json:"orderUid"`
@@ -21,4 +21,14 @@ type OrderWB struct {
 }
 type Orders struct {
 	Orders []OrderWB `json:"orders"`
+}
+
+type StickerWB struct {
+	Stickers []struct {
+		OrderId int    `json:"orderId"`
+		PartA   string `json:"partA"`
+		PartB   string `json:"partB"`
+		Barcode string `json:"barcode"`
+		File    string `json:"file"`
+	} `json:"stickers"`
 }
