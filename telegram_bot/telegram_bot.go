@@ -47,7 +47,7 @@ var (
 func main() {
 	token, err := initEnv("variables.env", "TOKEN")
 	if err != nil {
-		return
+		log.Panic(err)
 	}
 
 	bot, err = tgbotapi.NewBotAPI(token)
